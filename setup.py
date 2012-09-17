@@ -40,6 +40,9 @@ setup(name='collective.z3cform.dgftreeselect',
       zip_safe=False,
       install_requires=[
           'setuptools',
+          'five.grok',
+          'plone.directives.form',
+          'collective.z3cform.datagridfield'
           # -*- Extra requirements: -*-
       ],
       extras_require={'test': ['plone.app.testing']},
