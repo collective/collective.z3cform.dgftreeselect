@@ -5,6 +5,7 @@
     xmlns:genericsetup="http://namespaces.zope.org/genericsetup"
     xmlns:grok="http://namespaces.zope.org/grok"
     i18n_domain="collective.z3cform.dgftreeselect"
+    xmlns:z3c="http://namespaces.zope.org/z3c"
     >
 
   <includeDependencies package="." />
@@ -23,5 +24,12 @@
       provides="Products.GenericSetup.interfaces.EXTENSION"
       />
   <!-- -*- extra stuff goes here -*- -->
+
+  <z3c:widgetTemplate
+      mode="input"
+      widget=".widget.DGFTreeSelectWidget"
+      layer="z3c.form.interfaces.IFormLayer"
+      template="select_input.pt"
+      />
 
 </configure>
