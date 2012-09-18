@@ -29,3 +29,35 @@ class DGFTreeSelectWidget(SelectWidget):
 def DGFTreeSelectFieldWidget(field, request):
     """IFieldWidget factory for SelectWidget."""
     return FieldWidget(field, DGFTreeSelectWidget(request))
+
+
+def prepare_tree_selection(subform, dgf, source_url):
+    """
+
+    :param dbf: DataGridWidget instance with tree selection widgets
+
+    :param source_url: Where to load tree JSON
+    """
+
+    # Create master-slave chain ids
+    #
+    # Set widget.master and widget.slave attributes
+    # to column ids to build the tree structure in Javascript
+
+    master = None
+
+    for widget in subform.widgets.values():
+
+        if not isinstance(widget, DGFTreeSelectWidget):
+            raise AssertionError("Got mixed up with wrong widget types in tree multi-select: %s" % widget.__class__)
+
+        if master:
+            # Wid
+            widget.master = master.field.getName()
+            master.slave = widget.field.getName()
+        else:
+            widget.master = None
+
+        master = widget
+
+    dgf.extra = source_url

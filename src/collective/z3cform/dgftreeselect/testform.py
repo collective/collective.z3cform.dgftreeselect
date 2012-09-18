@@ -16,17 +16,28 @@ from five import grok
 from plone.directives import form
 
 from collective.z3cform.datagridfield import DataGridFieldFactory, DictRow
-from .widget import DGFTreeSelectFieldWidget
-
+from .widget import DGFTreeSelectFieldWidget, prepare_tree_selection
+from .form import TreeFormMixin
 
 SAMPLE_DATA = [
     {
+        "id": "unknown",
+        "label": "Unknown"
+    },
+
+    {
         "id": "a",
-        "name": "A",
+        "label": "A",
         "children": [
+
+            {
+                "id": "unknown",
+                "label": "Unknown"
+            },
+
             {
                 "id": "aa",
-                "name": "AA",
+                "label": "AA",
                 "children": [
                     {
                         "id ": "aaa",
@@ -37,16 +48,16 @@ SAMPLE_DATA = [
 
             {
                 "id": "ab",
-                "name": "AB",
+                "label": "AB",
                 "children": [
                     {
                         "id": "aba",
-                        "name": "ABA",
+                        "label": "ABA",
                     },
 
                     {
                         "id": "abb",
-                        "name": "ABB",
+                        "label": "ABB",
                     }
 
                 ]
@@ -57,11 +68,11 @@ SAMPLE_DATA = [
 
     {
         "id": "b",
-        "name": "B",
+        "label": "B",
         "children": [
             {
                 "id": "ba",
-                "name": "BA",
+                "label": "BA",
                 "children": [
                     {
                         "id ": "baa",
@@ -72,16 +83,16 @@ SAMPLE_DATA = [
 
             {
                 "id": "bb",
-                "name": "BB",
+                "label": "BB",
                 "children": [
                     {
                         "id": "bba",
-                        "name": "BBA",
+                        "label": "BBA",
                     },
 
                     {
                         "id": "bbb",
-                        "name": "BBB",
+                        "label": "BBB",
                     }
 
                 ]
@@ -105,7 +116,7 @@ class IFormSchema(form.Schema):
         value_type=DictRow(title=u"tablerow", schema=ITableRowSchema))
 
 
-class EditForm(form.SchemaForm):
+class EditForm(TreeFormMixin, form.SchemaForm):
     grok.context(ISiteRoot)
     grok.name("dgftreeselect-test")
     grok.require('zope2.View')
@@ -115,44 +126,13 @@ class EditForm(form.SchemaForm):
 
     label = u"Tree selection demo and manual testing"
 
-    def datagridInitialise(self, subform, field):
-        """ Callback to customize the datagridfield
-
-        :param field: DataGridField instance
-
-        :param subform: DataGridFieldObjectSubForm instance
-        """
-
-        # Turn all fields in the table to use custom election widgets
-        for field in subform.fields.values():
-            field.widgetFactory = DGFTreeSelectFieldWidget
-
-        # CReate
-
-    def datagridUpdateWidgets(self, subform, widgets, widget):
-        """
-        """
-
-        # Set tree-mapping master-slace relationships between
-        # widgets in the row
-
-        widgets["one"].master = None
-        widgets["one"].slave = "two"
-
-        widgets["two"].master = "one"
-        widgets["two"].slave = "three"
-
-        widgets["three"].master = "two"
-        widgets["three"].slave = None
-
+    def getTreeDataURL(self, subform):
         context = self.context.aq_inner
         portal_state = getMultiAdapter((context, self.request), name=u'plone_portal_state')
 
         # AJAX will load tree source data from this URL
         sourceURL = portal_state.portal_url() + "/dgftreeselect-test-data"
-
-        for widget in widgets.values():
-            widget.sourceURL = sourceURL
+        return sourceURL
 
 
 class DataSource(grok.CodeView):
