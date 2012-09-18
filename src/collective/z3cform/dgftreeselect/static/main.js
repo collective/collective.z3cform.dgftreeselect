@@ -177,23 +177,26 @@
         /**
          * (Re)populate <select> options after the parent has changed
          */
-        refreshSelect : function(select) {
+        refreshSelect : function(select, initialLoad) {
 
             var initialValue = select.attr("data-initial-value");
 
             function initOptions(select, options) {
 
-                $.each(options, function() {
-                    var opt = $("<option>");
-                    opt.attr("value", this.id);
-                    opt.text(this.label);
+                var i;
 
-                    if(initialValue == this.id) {
+                for(i=0; i<options.length; i++) {
+                    var src = options[i];
+                    var opt = $("<option></option>");
+                    opt.val(src.id);
+                    opt.text(src.label);
+
+                    if(initialValue == src.id && initialLoad) {
                         opt.attr("selected", true);
                     }
 
                     select.append(opt);
-                });
+                }
 
             }
 

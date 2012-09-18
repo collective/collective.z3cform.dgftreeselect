@@ -8,7 +8,7 @@
                         data-slave-name view/slave|nothing;
                         data-tree-name view/field/getName|nothing;
                         data-initial-value vie/value|nothing;
-                        name string:${view/name}:list;
+                        name string:${view/name};
                         class view/klass;
                         style view/style;
                         title view/title;">

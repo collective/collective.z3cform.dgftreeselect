@@ -10,6 +10,7 @@ from zope import schema
 from zope import interface
 from zope.component import getMultiAdapter
 from Products.CMFCore.interfaces import ISiteRoot
+from z3c.form import button
 
 from five import grok
 
@@ -40,8 +41,8 @@ SAMPLE_DATA = [
                 "label": "AA",
                 "children": [
                     {
-                        "id ": "aaa",
-                        "name ": "AAA",
+                        "id": "aaa",
+                        "label": "AAA",
                     }
                 ]
             },
@@ -133,6 +134,10 @@ class EditForm(TreeFormMixin, form.SchemaForm):
         # AJAX will load tree source data from this URL
         sourceURL = portal_state.portal_url() + "/dgftreeselect-test-data"
         return sourceURL
+
+    @button.buttonAndHandler(u'Turbo boost')
+    def handleApply(self, action):
+        pass
 
 
 class DataSource(grok.CodeView):
