@@ -7,7 +7,7 @@
                         data-master-name view/master|nothing;
                         data-slave-name view/slave|nothing;
                         data-tree-name view/field/getName|nothing;
-                        data-initial-value vie/value|nothing;
+                        data-initial-value view/value|nothing;
                         name string:${view/name};
                         class view/klass;
                         style view/style;

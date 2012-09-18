@@ -10,14 +10,16 @@ from zope import schema
 from zope import interface
 from zope.component import getMultiAdapter
 from Products.CMFCore.interfaces import ISiteRoot
+from zope.interface import Invalid
+
 from z3c.form import button
+from z3c.form.interfaces import ActionExecutionError
 
 from five import grok
 
 from plone.directives import form
 
 from collective.z3cform.datagridfield import DataGridFieldFactory, DictRow
-from .widget import DGFTreeSelectFieldWidget, prepare_tree_selection
 from .form import TreeFormMixin
 
 SAMPLE_DATA = [
@@ -76,8 +78,8 @@ SAMPLE_DATA = [
                 "label": "BA",
                 "children": [
                     {
-                        "id ": "baa",
-                        "name ": "BAA",
+                        "id": "baa",
+                        "label": "BAA",
                     }
                 ]
             },
@@ -137,7 +139,13 @@ class EditForm(TreeFormMixin, form.SchemaForm):
 
     @button.buttonAndHandler(u'Turbo boost')
     def handleApply(self, action):
-        pass
+
+        data, errors = self.extractData()
+        if errors:
+            self.status = self.formErrorsMessage
+            return
+
+        raise ActionExecutionError(Invalid(u"Please see that data stays intact over postback"))
 
 
 class DataSource(grok.CodeView):

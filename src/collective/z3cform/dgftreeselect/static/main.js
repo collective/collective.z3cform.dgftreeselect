@@ -162,6 +162,14 @@
             return chain;
         },
 
+
+        /**
+         * Initial population of the widge rows.
+         *
+         * After tree data is loaded, populate each
+         * <select> with option list from the data and
+         * select the initial value.
+         */
         populateRow : function(elem, data, row) {
 
             var selects = row.find("select");
@@ -170,7 +178,7 @@
             for(i=0; i<selects.size(); i++) {
                 var select = $(selects.get(i));
                 select.data("treeData", data);
-                this.refreshSelect(select);
+                this.refreshSelect(select, true);
             }
         },
 
