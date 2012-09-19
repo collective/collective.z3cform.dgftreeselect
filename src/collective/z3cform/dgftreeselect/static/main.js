@@ -172,7 +172,7 @@
          */
         populateRow : function(elem, data, row) {
 
-            var selects = row.find("select");
+            var selects = row.find(".dgf-tree-select-widget");
             var i;
 
             for(i=0; i<selects.size(); i++) {
