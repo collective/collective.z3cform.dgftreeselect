@@ -129,7 +129,7 @@ class EditForm(TreeFormMixin, form.SchemaForm):
 
     label = u"Tree selection demo and manual testing"
 
-    def getTreeDataURL(self, subform):
+    def getTreeDataURL(self, subform, widgets, widget):
         context = self.context.aq_inner
         portal_state = getMultiAdapter((context, self.request), name=u'plone_portal_state')
 

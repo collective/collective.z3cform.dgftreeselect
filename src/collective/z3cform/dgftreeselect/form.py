@@ -7,7 +7,7 @@ class TreeFormMixin(object):
     Forms having DGF tree selection must mix in with this base class.
     """
 
-    def getTreeDataURL(self, subform):
+    def getTreeDataURL(self, subform, widgets, widget):
         raise NotImplementedError("Subclass must implement")
 
     def datagridInitialise(self, subform, field):
@@ -26,5 +26,5 @@ class TreeFormMixin(object):
         """
         """
 
-        sourceURL = self.getTreeDataURL(subform)
+        sourceURL = self.getTreeDataURL(subform, widgets, widget)
         prepare_tree_selection(subform, widget, sourceURL)

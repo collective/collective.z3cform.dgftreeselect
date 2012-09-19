@@ -5,10 +5,13 @@
     xmlns:genericsetup="http://namespaces.zope.org/genericsetup"
     xmlns:grok="http://namespaces.zope.org/grok"
     i18n_domain="collective.z3cform.dgftreeselect"
+    xmlns:zcml="http://namespaces.zope.org/zcml"
     xmlns:z3c="http://namespaces.zope.org/z3c"
     >
 
   <includeDependencies package="." />
+
+  <include zcml:condition="installed plone.app.caching" file="cache.zcml" />
 
   <five:registerPackage package="." initialize=".initialize" />
 

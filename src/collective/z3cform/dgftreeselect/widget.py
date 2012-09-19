@@ -1,3 +1,5 @@
+import time
+
 import zope.interface
 
 from z3c.form import interfaces
@@ -6,6 +8,7 @@ from z3c.form.browser.select import SelectWidget
 from z3c.form.widget import FieldWidget
 from z3c.form.browser.text import TextWidget
 
+start_time = time.time()
 
 class DGFTreeSelectWidget(TextWidget):
     """
@@ -49,8 +52,6 @@ def prepare_tree_selection(subform, dgf, source_url):
 
     for widget in subform.widgets.values():
 
-        print widget.value
-
         if not isinstance(widget, DGFTreeSelectWidget):
             raise AssertionError("Got mixed up with wrong widget types in tree multi-select: %s" % widget.__class__)
 
@@ -63,4 +64,4 @@ def prepare_tree_selection(subform, dgf, source_url):
 
         master = widget
 
-    dgf.extra = source_url
+    dgf.extra = source_url + "?%f" % start_time

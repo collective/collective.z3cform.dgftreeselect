@@ -1,0 +1,26 @@
+<configure
+    xmlns="http://namespaces.zope.org/zope"
+    xmlns:browser="http://namespaces.zope.org/browser"
+    xmlns:cache="http://namespaces.zope.org/cache"
+    >
+
+  <include package="z3c.caching" file="meta.zcml" />
+
+  <!-- Let's define a ruleset which we use to cover all almost static
+      pages which get heavy traffic.  This will appear in Cache
+      configuration of Site setup control panel. -->
+  <cache:rulesetType
+      name="collective.z3cform.dgftreeselect.ajax"
+      title="Tree select JSON AJAX response"
+      description="Cache the resulting JSON file in the browser"
+      />
+
+  <!-- We include one grok.View class in our ruleset. This view is being
+      used at the site front page. -->
+  <cache:ruleset
+      for=".testform.EditForm"
+      ruleset="collective.z3cform.dgftreeselect.ajax"
+      />
+
+
+</configure>
