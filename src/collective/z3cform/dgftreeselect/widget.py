@@ -53,7 +53,8 @@ def prepare_tree_selection(subform, dgf, source_url):
     for widget in subform.widgets.values():
 
         if not isinstance(widget, DGFTreeSelectWidget):
-            raise AssertionError("Got mixed up with wrong widget types in tree multi-select: %s" % widget.__class__)
+            # Not part of the grid
+            continue
 
         if master:
             # Wid

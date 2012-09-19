@@ -1,5 +1,4 @@
 from .widget import prepare_tree_selection
-from .widget import DGFTreeSelectFieldWidget
 
 
 class TreeFormMixin(object):
@@ -17,10 +16,7 @@ class TreeFormMixin(object):
 
         :param subform: DataGridFieldObjectSubForm instance
         """
-
-        # Turn all fields in the table to use custom election widgets
-        for field in subform.fields.values():
-            field.widgetFactory = DGFTreeSelectFieldWidget
+        pass
 
     def datagridUpdateWidgets(self, subform, widgets, widget):
         """

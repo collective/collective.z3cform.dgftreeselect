@@ -21,6 +21,7 @@ from plone.directives import form
 
 from collective.z3cform.datagridfield import DataGridFieldFactory, DictRow
 from .form import TreeFormMixin
+from .widget import DGFTreeSelectFieldWidget
 
 SAMPLE_DATA = [
     {
@@ -106,10 +107,25 @@ SAMPLE_DATA = [
 ]
 
 
-class ITableRowSchema(interface.Interface):
+class ITableRowSchema(form.Schema):
+
+    # These fields are linked together by tree select
+
+    form.widget(one=DGFTreeSelectFieldWidget)
     one = schema.TextLine(title=u"Level 1", required=False)
+
+    form.widget(two=DGFTreeSelectFieldWidget)
     two = schema.TextLine(title=u"Level 2", required=False)
+
+    form.widget(three=DGFTreeSelectFieldWidget)
     three = schema.TextLine(title=u"Level 3", required=False)
+
+    # This field is independent from the rest of the fields
+
+    independent = schema.Bool(
+        title=u"Independent",
+        description=u"Do not take part to the decision tree",
+        required=False)
 
 
 class IFormSchema(form.Schema):
