@@ -17,6 +17,7 @@ from z3c.form.interfaces import ActionExecutionError
 
 from five import grok
 
+
 from plone.directives import form
 
 from collective.z3cform.datagridfield import DataGridFieldFactory, DictRow
@@ -123,9 +124,15 @@ class ITableRowSchema(form.Schema):
     # This field is independent from the rest of the fields
 
     independent = schema.Bool(
-        title=u"Independent",
+        title=u"Check me",
         description=u"Do not take part to the decision tree",
         required=False)
+
+    choices = schema.Choice(
+        title=u"Independent select",
+        description=u"Do not take part to the decision tree",
+        required=False,
+        vocabulary="plone.app.vocabularies.Workflows")
 
 
 class IFormSchema(form.Schema):
