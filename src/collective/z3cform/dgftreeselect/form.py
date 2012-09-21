@@ -1,4 +1,7 @@
-from .widget import prepare_tree_selection
+#from .widget import prepare_tree_selection
+#from .widget import prepare_tree_selection
+
+from collective.z3cform.datagridfield.datagridfield import DataGridField
 
 
 class TreeFormMixin(object):
@@ -22,5 +25,4 @@ class TreeFormMixin(object):
         """
         """
 
-        sourceURL = self.getTreeDataURL(subform, widgets, widget)
-        prepare_tree_selection(subform, widget, sourceURL)
+

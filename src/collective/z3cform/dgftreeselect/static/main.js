@@ -29,6 +29,11 @@
                 var elem = $(this);
                 var url = elem.attr("data-extra");
 
+                // Normal data grid field
+                if(!url) {
+                    return;
+                }
+
                 function got(data) {
                     self.populateTreeWidgets(elem, data);
                 }
@@ -172,11 +177,12 @@
          */
         populateRow : function(elem, data, row) {
 
-            var selects = row.find(".dgf-tree-select-widget");
+            var selects = row.children("td").children(".dgf-tree-select-widget");
             var i;
 
             for(i=0; i<selects.size(); i++) {
                 var select = $(selects.get(i));
+                console.log("Populating:" + select.attr("id") + " " + select.attr("data-initial-value"));
                 select.data("treeData", data);
                 this.refreshSelect(select, true);
             }
@@ -215,6 +221,10 @@
 
             var options = this.getOptionsList(data, chain);
 
+            console.log("Initial value:" + initialValue);
+            console.log("Chain:" + chain);
+            console.log("Options:" + options);
+
             // No options availble
             if(!options) {
                 select.hide();
@@ -246,7 +256,7 @@
             firstSelect.show();
 
             // Do the same for the template row
-            lastRow = elem.find("tr").last();
+            lastRow = elem.find("tr.datagridwidget-empty-row").last();
             firstSelect = lastRow.find("select").first();
             firstSelect.show();
 
