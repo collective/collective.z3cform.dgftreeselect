@@ -204,6 +204,20 @@ def getDefaultFeatureMatrixVAlue(data):
     return FEATURE_MATRIX_ROWS[:]
 
 
+@component.adapter(schema.interfaces.IField, z3c.form.interfaces)
+@interface.implementer(z3c.form.interfaces.IFieldWidget)
+def DeviceModelRowFactory(field, request):
+    """
+    A special widget constructor setting up widget parameters for DGF.
+    """
+    widget = DataGridFieldFactory(field, request)
+    widget.allow_insert = True
+    widget.allow_delete = True
+    widget.allow_reorder = False
+    widget.auto_append = True
+    return widget
+
+
 class IFormSchema(form.Schema):
 
     #form.widget(table=DataGridFieldFactory)
@@ -214,7 +228,7 @@ class IFormSchema(form.Schema):
 
     # Insert yo dawg joke here
 
-    form.widget(table2=DataGridFieldFactory)
+    form.widget(table2=DeviceModelRowFactory)
     table2 = schema.List(title=u"Nested fixed DGF inside a DataGridField",
         value_type=DictRow(title=u"devicerow", schema=IDeviceModelRow))
 

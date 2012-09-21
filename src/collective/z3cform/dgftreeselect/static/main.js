@@ -27,22 +27,90 @@
 
             dgfs.each(function() {
                 var elem = $(this);
-                var url = elem.attr("data-extra");
+                self.initDGF(elem);
 
-                // Normal data grid field
-                if(!url) {
-                    return;
-                }
-
-                function got(data) {
-                    self.populateTreeWidgets(elem, data);
-                }
-
-                $.getJSON(url, got);
             });
 
-            // Set global event handler
-            dgfs.delegate(".dgf-tree-select-widget", "change", $.proxy(this.handleSelect, this));
+            $(document.body).delegate(".datagridwidget-table-view", "beforeaddrow beforeaddrowauto", $.proxy(self.handleNestedDGFInsert, self));
+
+        },
+
+        /**
+          * Delay AJAX calls for DataGridField widgets which are invisible by default
+          */
+        tryInitLater : function(elem) {
+            var self = this;
+            function checkIfBecomeVisible() {
+                self.initDGF(elem);
+            }
+            window.setTimeout(checkIfBecomeVisible, 500);
+        },
+
+        /**
+         * Initialize a datagridfield containing tree select widgets
+         *
+         * @param  {Objeect} elem .datagridwidget-table-view
+         */
+        initDGF : function(elem) {
+            var url = elem.attr("data-extra");
+            var self = this;
+
+            // Avoid double init
+            if(elem.data("tree-select-init")) {
+                return;
+            }
+
+            if(!elem.is(":visible")) {
+                this.tryInitLater(elem);
+                return;
+            }
+
+            var field = elem.parent();
+
+            // Normal data grid field
+            if(!url) {
+                return;
+            }
+
+            // Make actual grid visible after it has been populated
+            function got(data) {
+                field.find(".tree-select-load").hide();
+                self.populateTreeWidgets(elem, data);
+                elem.show();
+                elem.data("tree-select-init", true);
+
+                // Add the nested insert event handler
+                elem.bind("beforeaddrow", function() {
+                    window.alert("aaa");
+                });
+
+                // Set tree select event handler
+                elem.delegate(".dgf-tree-select-widget", "change", $.proxy(self.handleSelect, self));
+            }
+
+            // Show the ajax spinner until we have data
+            var img = window.portal_url + "/spinner.gif";
+            var ajaxLoader = $("<img class='tree-select-load' src='" + img + "' />");
+            field.prepend(ajaxLoader);
+            elem.hide();
+
+            $.getJSON(url, got);
+        },
+
+        /**
+         * See that if the datagridfield row contains nested tree select widgets and call
+         * populateRow for them if needed.
+         */
+        handleNestedDGFInsert : function(event, dgf, row) {
+            row = $(row);
+            var dgfs = row.find(".datagridwidget-table-view");
+            var self = this;
+
+            dgfs.each(function() {
+                var elem = $(this);
+                self.initDGF(elem);
+
+            });
         },
 
         /**
@@ -182,7 +250,7 @@
 
             for(i=0; i<selects.size(); i++) {
                 var select = $(selects.get(i));
-                console.log("Populating:" + select.attr("id") + " " + select.attr("data-initial-value"));
+                //console.log("Populating:" + select.attr("id") + " " + select.attr("data-initial-value"));
                 select.data("treeData", data);
                 this.refreshSelect(select, true);
             }
@@ -221,9 +289,9 @@
 
             var options = this.getOptionsList(data, chain);
 
-            console.log("Initial value:" + initialValue);
-            console.log("Chain:" + chain);
-            console.log("Options:" + options);
+            //console.log("Initial value:" + initialValue);
+            //console.log("Chain:" + chain);
+            //console.log("Options:" + options);
 
             // No options availble
             if(!options) {
