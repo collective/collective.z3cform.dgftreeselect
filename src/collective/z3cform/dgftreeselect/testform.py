@@ -14,12 +14,12 @@ from zope.component import getMultiAdapter
 from Products.CMFCore.interfaces import ISiteRoot
 from zope.interface import Invalid
 from zope.schema.vocabulary import SimpleVocabulary
+from five import grok
+
 
 from z3c.form import button
 from z3c.form.interfaces import ActionExecutionError
 import z3c.form.interfaces
-
-from five import grok
 
 
 from plone.directives import form
@@ -27,7 +27,7 @@ from plone.directives import form
 from collective.z3cform.datagridfield import DataGridFieldFactory, DictRow
 from .form import TreeFormMixin
 from .widget import DGFTreeSelectFieldWidget
-from .interfaces import ITreeSelectURLProvider
+
 
 SAMPLE_DATA = [
     {
@@ -111,7 +111,6 @@ SAMPLE_DATA = [
         ]
     },
 ]
-
 
 
 class ITableRowSchema(form.Schema):
@@ -219,18 +218,31 @@ def DeviceModelRowFactory(field, request):
 
 
 class IFormSchema(form.Schema):
+    """
+    An example form with two tree selections.
 
-    #form.widget(table=DataGridFieldFactory)
-    #table = schema.List(title=u"Nested selection tree test",
-    #    value_type=DictRow(title=u"tablerow", schema=ITableRowSchema))
+
+    - One nested inside another datagridfield
+
+    """
+
+    form.widget(table=DataGridFieldFactory)
+    table = schema.List(
+        title=u"Tree select",
+        value_type=DictRow(title=u"tablerow", schema=ITableRowSchema),
+        description=u"Normal decision tree. The last columns are independent of decision tree values."
+        )
 
     foobar = schema.Bool(title=u"Just another field")
 
     # Insert yo dawg joke here
 
     form.widget(table2=DeviceModelRowFactory)
-    table2 = schema.List(title=u"Nested fixed DGF inside a DataGridField",
-        value_type=DictRow(title=u"devicerow", schema=IDeviceModelRow))
+    table2 = schema.List(
+        title=u"Nested fixed DGF inside a DataGridField",
+        value_type=DictRow(title=u"devicerow", schema=IDeviceModelRow),
+        description=u"A decision tree nested inside a DGF cell. Very useful for products' feature sets' kind of data input",
+        )
 
 
 # We register the provider in this perverted way, because
@@ -246,10 +258,15 @@ def TreeSourceURL(schema, widget, form, context, request):
     return sourceURL
 
 IDeviceProperty.setTaggedValue("TreeSelectURLProvider", TreeSourceURL)
-IFormSchema.setTaggedValue("TreeSelectURLProvider", TreeSourceURL)
+ITableRowSchema.setTaggedValue("TreeSelectURLProvider", TreeSourceURL)
 
 
 class EditForm(TreeFormMixin, form.SchemaForm):
+    """
+    Edit form for our model.
+
+    We got one dummy button which allows us to manually inspect the data postback values.
+    """
     grok.context(ISiteRoot)
     grok.name("dgftreeselect-test")
     grok.require('zope2.View')

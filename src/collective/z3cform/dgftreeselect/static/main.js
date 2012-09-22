@@ -8,7 +8,7 @@
 
     var DGFTreeHelper = {
 
-        dataSources : {},
+        dataCache : {},
 
         /**
          * Scale all DFG tree fields.
@@ -40,6 +40,7 @@
           */
         tryInitLater : function(elem) {
             var self = this;
+
             function checkIfBecomeVisible() {
                 self.initDGF(elem);
             }
@@ -50,8 +51,14 @@
          * Initialize a datagridfield containing tree select widgets
          *
          * @param  {Objeect} elem .datagridwidget-table-view
+         *
+         * @param {Boolean} hidden Initialize tree select widget even if
+         *                  it is hidden. Otherwise we wait and poll
+         *                  until the element becomes visibile
+         *                  and after then trigger the AJAX request
+         *                  loading the tree data.
          */
-        initDGF : function(elem) {
+        initDGF : function(elem, hidden) {
             var url = elem.attr("data-extra");
             var self = this;
 
@@ -60,9 +67,11 @@
                 return;
             }
 
-            if(!elem.is(":visible")) {
-                this.tryInitLater(elem);
-                return;
+            if(!hidden) {
+                if(!elem.is(":visible")) {
+                    this.tryInitLater(elem);
+                    return;
+                }
             }
 
             var field = elem.parent();
@@ -74,27 +83,34 @@
 
             // Make actual grid visible after it has been populated
             function got(data) {
+
+                self.dataCache[url] = data;
+
                 field.find(".tree-select-load").hide();
                 self.populateTreeWidgets(elem, data);
                 elem.show();
                 elem.data("tree-select-init", true);
 
-                // Add the nested insert event handler
-                elem.bind("beforeaddrow", function() {
-                    window.alert("aaa");
-                });
-
                 // Set tree select event handler
                 elem.delegate(".dgf-tree-select-widget", "change", $.proxy(self.handleSelect, self));
             }
 
-            // Show the ajax spinner until we have data
-            var img = window.portal_url + "/spinner.gif";
-            var ajaxLoader = $("<img class='tree-select-load' src='" + img + "' />");
-            field.prepend(ajaxLoader);
-            elem.hide();
+            // Check if we already have the tree data from this URL loaded on the same page
+            var data = this.dataCache[url];
 
-            $.getJSON(url, got);
+            if(data) {
+                got(data);
+            }  else {
+
+                // Show the ajax spinner until we have data
+                var img = window.portal_url + "/spinner.gif";
+                var ajaxLoader = $("<img class='tree-select-load' src='" + img + "' />");
+                field.prepend(ajaxLoader);
+                elem.hide();
+
+
+                $.getJSON(url, got);
+            }
         },
 
         /**
@@ -108,8 +124,7 @@
 
             dgfs.each(function() {
                 var elem = $(this);
-                self.initDGF(elem);
-
+                self.initDGF(elem, true);
             });
         },
 
