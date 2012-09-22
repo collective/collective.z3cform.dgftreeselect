@@ -1,0 +1,70 @@
+[
+ {
+  "id": "unknown",
+  "label": "Unknown"
+ },
+ {
+  "children": [
+   {
+    "id": "unknown",
+    "label": "Unknown"
+   },
+   {
+    "children": [
+     {
+      "id": "aaa",
+      "label": "AAA"
+     }
+    ],
+    "id": "aa",
+    "label": "AA"
+   },
+   {
+    "children": [
+     {
+      "id": "aba",
+      "label": "ABA"
+     },
+     {
+      "id": "abb",
+      "label": "ABB"
+     }
+    ],
+    "id": "ab",
+    "label": "AB"
+   }
+  ],
+  "id": "a",
+  "label": "A"
+ },
+ {
+  "children": [
+   {
+    "children": [
+     {
+      "id": "baa",
+      "label": "BAA"
+     }
+    ],
+    "id": "ba",
+    "label": "BA"
+   },
+   {
+    "children": [
+     {
+      "id": "bba",
+      "label": "BBA"
+     },
+     {
+      "id": "bbb",
+      "label": "BBB"
+     }
+    ],
+    "id": "bb",
+    "label": "BB"
+   }
+  ],
+  "id": "b",
+  "label": "B"
+ }
+]

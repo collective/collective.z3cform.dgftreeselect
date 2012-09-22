@@ -29,90 +29,6 @@ from .form import TreeFormMixin
 from .widget import DGFTreeSelectFieldWidget
 
 
-SAMPLE_DATA = [
-    {
-        "id": "unknown",
-        "label": "Unknown"
-    },
-
-    {
-        "id": "a",
-        "label": "A",
-        "children": [
-
-            {
-                "id": "unknown",
-                "label": "Unknown"
-            },
-
-            {
-                "id": "aa",
-                "label": "AA",
-                "children": [
-                    {
-                        "id": "aaa",
-                        "label": "AAA",
-                    }
-                ]
-            },
-
-            {
-                "id": "ab",
-                "label": "AB",
-                "children": [
-                    {
-                        "id": "aba",
-                        "label": "ABA",
-                    },
-
-                    {
-                        "id": "abb",
-                        "label": "ABB",
-                    }
-
-                ]
-            },
-
-        ]
-    },
-
-    {
-        "id": "b",
-        "label": "B",
-        "children": [
-            {
-                "id": "ba",
-                "label": "BA",
-                "children": [
-                    {
-                        "id": "baa",
-                        "label": "BAA",
-                    }
-                ]
-            },
-
-            {
-                "id": "bb",
-                "label": "BB",
-                "children": [
-                    {
-                        "id": "bba",
-                        "label": "BBA",
-                    },
-
-                    {
-                        "id": "bbb",
-                        "label": "BBB",
-                    }
-
-                ]
-            },
-
-        ]
-    },
-]
-
-
 class ITableRowSchema(form.Schema):
 
     # These fields are linked together by tree select
@@ -198,7 +114,7 @@ FEATURE_MATRIX_ROWS = [
 
 
 @form.default_value(field=IDeviceModelRow['featureMatrix'])
-def getDefaultFeatureMatrixVAlue(data):
+def getDefaultFeatureMatrixValue(data):
     # Clone the source template
     return FEATURE_MATRIX_ROWS[:]
 
@@ -213,7 +129,7 @@ def DeviceModelRowFactory(field, request):
     widget.allow_insert = True
     widget.allow_delete = True
     widget.allow_reorder = False
-    widget.auto_append = True
+    widget.auto_append = False
     return widget
 
 
@@ -239,10 +155,18 @@ class IFormSchema(form.Schema):
 
     form.widget(table2=DeviceModelRowFactory)
     table2 = schema.List(
-        title=u"Nested fixed DGF inside a DataGridField",
+        title=u"Feature matrix: nested fixed DGF inside a DataGridField",
         value_type=DictRow(title=u"devicerow", schema=IDeviceModelRow),
         description=u"A decision tree nested inside a DGF cell. Very useful for products' feature sets' kind of data input",
         )
+
+
+@form.default_value(field=IFormSchema['table2'])
+def getEmptyFeatureMatrix(data):
+    """
+    The initial population of feature matrix example
+    """
+    return [dict(deviceModel="", featureMatrix=getDefaultFeatureMatrixValue(data))]
 
 
 # We register the provider in this perverted way, because
@@ -254,7 +178,7 @@ def TreeSourceURL(schema, widget, form, context, request):
     context = getSite()
     portal_state = getMultiAdapter((context, request), name=u'plone_portal_state')
     # AJAX will load tree source data from this URL
-    sourceURL = portal_state.portal_url() + "/dgftreeselect-test-data"
+    sourceURL = portal_state.portal_url() + "/++resource++collective.z3cform.dgftreeselect/demochoices.json"
     return sourceURL
 
 IDeviceProperty.setTaggedValue("TreeSelectURLProvider", TreeSourceURL)
@@ -287,13 +211,3 @@ class EditForm(TreeFormMixin, form.SchemaForm):
         raise ActionExecutionError(Invalid(u"Please see that data stays intact over postback"))
 
 
-class DataSource(grok.CodeView):
-    """
-    Generate JSON array needed to populate the fields
-    """
-    grok.context(ISiteRoot)
-    grok.name("dgftreeselect-test-data")
-
-    def render(self):
-        self.request.response.setHeader("Content-type", "application/json")
-        return json.dumps(SAMPLE_DATA)
