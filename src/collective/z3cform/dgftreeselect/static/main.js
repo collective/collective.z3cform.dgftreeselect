@@ -67,7 +67,10 @@
                 return;
             }
 
+            // Check if we do hidden inits
             if(!hidden) {
+
+                // Wait until visible and poll back
                 if(!elem.is(":visible")) {
                     this.tryInitLater(elem);
                     return;
@@ -95,6 +98,11 @@
                 elem.delegate(".dgf-tree-select-widget", "change", $.proxy(self.handleSelect, self));
             }
 
+            // JSON data reading over AJAX failed
+            function fail(data) {
+                window.console.error("Could not initialize:" + url);
+            }
+
             // Check if we already have the tree data from this URL loaded on the same page
             var data = this.dataCache[url];
 
@@ -108,8 +116,16 @@
                 field.prepend(ajaxLoader);
                 elem.hide();
 
-
                 $.getJSON(url, got);
+
+                $.ajax({
+                  url: url,
+                  dataType: 'json',
+                  data: null,
+                  success: got,
+                  error : fail
+                });
+
             }
         },
 
