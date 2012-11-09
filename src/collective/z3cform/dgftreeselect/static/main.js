@@ -2,9 +2,31 @@
  * Multi-select tree choice helper javascript.
  */
 
+/*global console*/
+
 (function($) {
 
     "use strict";
+
+    // Spit out or fancy logging messages?
+    var debug = false;
+
+    // Internal debug output
+    function log(msg) {
+        if(console && console.log && debug) {
+            console.log(msg);
+        }
+    }
+
+    /**
+     * Get a debuf name for our DGF <table>
+     * @param  {jQuery} elem selection for <table>
+     */
+    function getDGFName(elem) {
+        var z3cWidget = elem.closest(".field");
+        var name = z3cWidget.attr("id");
+        return name;
+    }
 
     var DGFTreeHelper = {
 
@@ -42,7 +64,9 @@
             var self = this;
 
             function checkIfBecomeVisible() {
-                self.initDGF(elem);
+                var name = getDGFName(elem);
+                //log("Trying to initialize hidden:" + name);
+                self.initDGF(elem, false);
             }
             window.setTimeout(checkIfBecomeVisible, 500);
         },
@@ -52,15 +76,22 @@
          *
          * @param  {Objeect} elem .datagridwidget-table-view
          *
-         * @param {Boolean} hidden Initialize tree select widget even if
+         * @param {Boolean} hiddenInit Initialize tree select widget even if
          *                  it is hidden. Otherwise we wait and poll
          *                  until the element becomes visibile
          *                  and after then trigger the AJAX request
          *                  loading the tree data.
          */
-        initDGF : function(elem, hidden) {
+        initDGF : function(elem, hiddenInit) {
             var url = elem.attr("data-extra");
             var self = this;
+
+            var name = getDGFName(elem);
+
+            // Normal data grid field
+            if(!url) {
+                return;
+            }
 
             // Avoid double init
             if(elem.data("tree-select-init")) {
@@ -68,31 +99,34 @@
             }
 
             // Check if we do hidden inits
-            if(!hidden) {
+            if(!hiddenInit) {
 
                 // Wait until visible and poll back
                 if(!elem.is(":visible")) {
+                    //log("Postponing tree select init:" + name);
                     this.tryInitLater(elem);
                     return;
                 }
             }
 
-            var field = elem.parent();
+            // We have passed visibility check for the first time
 
-            // Normal data grid field
-            if(!url) {
-                return;
-            }
+            log("Initializing tree select:" + name);
+
+            elem.data("tree-select-init", true);
+
+            var field = elem.parent();
 
             // Make actual grid visible after it has been populated
             function got(data) {
 
                 self.dataCache[url] = data;
 
+                log("Got tree widget data:" + url);
+
                 field.find(".tree-select-load").hide();
                 self.populateTreeWidgets(elem, data);
                 elem.show();
-                elem.data("tree-select-init", true);
 
                 // Set tree select event handler
                 elem.delegate(".dgf-tree-select-widget", "change", $.proxy(self.handleSelect, self));
@@ -114,9 +148,7 @@
                 var img = window.portal_url + "/spinner.gif";
                 var ajaxLoader = $("<img class='tree-select-load' src='" + img + "' />");
                 field.prepend(ajaxLoader);
-                elem.hide();
-
-                $.getJSON(url, got);
+                //elem.hide();
 
                 $.ajax({
                   url: url,
@@ -281,7 +313,7 @@
 
             for(i=0; i<selects.size(); i++) {
                 var select = $(selects.get(i));
-                //console.log("Populating:" + select.attr("id") + " " + select.attr("data-initial-value"));
+                log("Populating:" + select.attr("id") + " " + select.attr("data-initial-value"));
                 select.data("treeData", data);
                 this.refreshSelect(select, true);
             }
@@ -387,7 +419,13 @@
     };
 
     $(document).ready(function() {
-        DGFTreeHelper.init();
+        // We need to make some timeout so that other possible field hiding
+        // code has time to run before us, so that dynamic loading code does kick in
+        // (All fields are visible by default, so is(":visible") does not work otherwise)
+        setTimeout(function() {
+            DGFTreeHelper.init();
+        }, 20);
+
     });
 
     // Expose for monkey-patching
